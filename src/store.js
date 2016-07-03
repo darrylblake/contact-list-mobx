@@ -1,5 +1,5 @@
 import {observable, computed, autorunAsync, action} from "mobx";
-import { getUsers } from './helpers';
+import { getUsers, getUser } from './helpers';
 
 class User {
   constructor(user) {
@@ -20,8 +20,10 @@ export class UsersStore {
   @observable loading;
   @observable users = {};
   @observable usersList = [];
+  @observable selectedUser;
   @observable tempList = this.usersList.slice();
   @action loadUsers() {
+    console.info('Loading users');
     this.loading = true;
     getUsers()
       .then(results => {
@@ -31,6 +33,7 @@ export class UsersStore {
         })
         this.usersList = Object.keys(this.users);
         this.tempList = this.usersList.slice();
+        this.search(this.searchField)
       })
       .catch(error => {
         this.loading = false;
@@ -38,8 +41,22 @@ export class UsersStore {
       });
   }
 
-  @action updateSearchField(e) {
-    this.searchField = e.target.value;
+  @action selectUser(id) {
+    this.selectedUser = this.users[id];
+  }
+
+  @action loadUser(id, callback) {
+    getUser(id)
+      .then(result => {
+        const user = result.data;
+        this.loading = false;
+        this.users[user.id] = user;
+        callback();
+      })
+  }
+
+  @action search(value) {
+    this.searchField = value;
     this.tempList = this.usersList.filter(userID => {
       return this.users[userID].index.toLowerCase().indexOf(this.searchField.toLowerCase()) !== -1;
     });
