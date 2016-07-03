@@ -2,22 +2,22 @@ import React, { Component, PropTypes } from 'react';
 import { observer } from 'mobx-react';
 import { Link, hashHistory } from 'react-router'
 
-@observer
+@observer(['store'])
 class MainContainer extends Component {
   componentWillMount() {
-    this.props.route.store.loadUsers();
+    this.props.store.loadUsers();
   }
 
   reverse() {
-    this.props.route.store.reverse();
+    this.props.store.reverse();
   }
 
   selectUser(id) {
-    this.props.route.store.selectUser(id);
+    this.props.store.selectUser(id);
   }
 
   renderRows() {
-    const { users, tempList, loading } = this.props.route.store;
+    const { users, tempList, loading } = this.props.store;
     return tempList.map(userID => {
       let user = users[userID];
       return (
@@ -37,8 +37,8 @@ class MainContainer extends Component {
       <div>
         <input 
           type="text" 
-          value={this.props.route.store.searchField} 
-          onChange={(e) => this.props.route.store.search(e.target.value)} />
+          value={this.props.store.searchField} 
+          onChange={(e) => this.props.store.search(e.target.value)} />
         <table>
           <thead>
             <tr>
@@ -61,7 +61,7 @@ class MainContainer extends Component {
     return <div>Loading</div>
   }
   render() {
-    if(this.props.route.store.loading) return this.renderLoading();
+    if(this.props.store.loading) return this.renderLoading();
     else {
       return this.renderList();
     }
