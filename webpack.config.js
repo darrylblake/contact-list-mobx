@@ -12,6 +12,7 @@ module.exports = {
   ],
   output: {
     path: __dirname + '/dist',
+    publicPath: '/',
     filename: "index_bundle.js"
   },
   module: {
@@ -20,6 +21,14 @@ module.exports = {
         test: /\.js$/, 
         loader: "babel",
         exclude: /node_modules/
+      },
+      {
+        test: /\.svg$/,
+        loader: "file",
+      },
+      {
+        test: /\.scss$/,
+        loaders: ["style", "css", "sass"],
       }
     ]
   },
