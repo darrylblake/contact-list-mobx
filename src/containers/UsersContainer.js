@@ -1,6 +1,16 @@
 import React, { Component, PropTypes } from 'react';
 import { observer } from 'mobx-react';
-import { Link, hashHistory } from 'react-router'
+import UserLink from '../components/UserLink';
+
+const styles =  {
+  search: {
+    float: 'right',
+    padding: '5px 10px',
+    fontSize: '15px',
+    borderRadius: '40px',
+    border: '1px solid #F0F0F0',
+  }
+}
 
 @observer(['store'])
 class MainContainer extends Component {
@@ -8,21 +18,13 @@ class MainContainer extends Component {
     this.props.store.loadUsers();
   }
 
-  reverse() {
-    this.props.store.reverse();
-  }
-
-  selectUser(id) {
-    this.props.store.selectUser(id);
-  }
-
   renderRows() {
     const { users, tempList, loading } = this.props.store;
-    return tempList.map(userID => {
+    return tempList.map((userID, i) => {
       let user = users[userID];
       return (
-        <tr>
-          <td><Link to={`/user/${userID}`} onClick={() => this.selectUser(userID)}>{user.name}</Link></td>
+        <tr key={i}>
+          <td><UserLink user={user} /></td>
           <td>{user.username}</td>
           <td><a href={`mailto:${user.email}`}>{user.email}</a></td>
           <td><a href={`tel:${user.phoneValid}`}>{user.phone}</a></td>
@@ -32,11 +34,30 @@ class MainContainer extends Component {
       )
     });
   }
-  renderList() {
+  sort(column) {
+    const users = this.props.store.users
+    let previousSortColumn = this.props.store.previousSortColumn;
+    const sortedList = this.props.store.tempList.sort((a, b) => {
+      if(previousSortColumn === column) {
+        return users[a][column] > users[b][column] ? -1 : 1;
+      } else {
+        return users[a][column] > users[b][column] ? 1 : -1;
+      }
+    });
+    // Toggling the sort...
+    if(previousSortColumn !== column)
+      this.props.store.previousSortColumn = column;
+    else
+      this.props.store.previousSortColumn = undefined;
+    this.props.store.tempList = sortedList.slice();
+  }
+  render() {
     return (
       <div>
         <input 
-          type="text" 
+          style={styles.search}
+          type="text"
+          placeholder="Search contacts..."
           value={this.props.store.searchField} 
           onChange={(e) => this.props.store.search(e.target.value)} />
         <table>
@@ -44,10 +65,10 @@ class MainContainer extends Component {
             <tr>
               <th onClick={() => this.sort('name')}>Name</th>
               <th onClick={() => this.sort('username')}>Username</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Website</th>
-              <th>Company</th>
+              <th onClick={() => this.sort('email')}>Email</th>
+              <th onClick={() => this.sort('phone')}>Phone</th>
+              <th onClick={() => this.sort('website')}>Website</th>
+              <th onClick={() => this.sort('company')}>Company</th>
             </tr>
           </thead>
           <tbody>
@@ -56,15 +77,6 @@ class MainContainer extends Component {
         </table>
       </div>
     )
-  }
-  renderLoading() {
-    return <div>Loading</div>
-  }
-  render() {
-    if(this.props.store.loading) return this.renderLoading();
-    else {
-      return this.renderList();
-    }
   }
 }
 

@@ -21,15 +21,15 @@ export class UsersStore {
   @observable users = {};
   @observable usersList = [];
   @observable selectedUser;
+  @observable previousSortColumn;
   @observable tempList = this.usersList.slice();
   @action loadUsers() {
-    console.info('Loading users');
     this.loading = true;
     getUsers()
       .then(results => {
         results.data.forEach(user => {
           this.loading = false;
-          this.users[user.id] = new User(user)
+          this.users[user.id] = new User(user);
         })
         this.usersList = Object.keys(this.users);
         this.tempList = this.usersList.slice();
@@ -39,6 +39,15 @@ export class UsersStore {
         this.loading = false;
         console.error(error)
       });
+  }
+
+  @computed get groupedList() {
+    let groupedByLetter = {};
+    this.usersList.forEach(userID => {
+      let user = this.users[userID];
+      groupedByLetter[user.name[0]] ? groupedByLetter[user.name[0]].push(user.id) : groupedByLetter[user.name[0]] = [user.id];
+    })
+    return groupedByLetter;
   }
 
   @action selectUser(id) {

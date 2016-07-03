@@ -7,10 +7,40 @@ import cardBacking from '../static/layout/backing.svg';
 
 var styles = {
   backing: {
+    margin: '0 auto',
     backgroundImage: `url(${cardBacking})`,
-    border: '1px solid red',
     height: 300,
     width: 500,
+    position: 'relative',
+  },
+  details: {
+    width: '50%',
+    paddingLeft: '10px',
+    marginTop: '20px',
+    float: 'right',
+    borderLeft: '3px solid #1E1F1F',
+  },
+  name: {
+    padding: '20px',
+    float: 'left',
+    width: '50%',
+    fontSize: 30,
+    lineHeight: '30px',
+    last: {
+      fontWeight: 300,
+    },
+    first: {
+      color: '#CE483B',
+      fontWeight: 700,
+      'background': '-webkit-linear-gradient(#CF483B, #9C332C)',
+      'WebkitBackgroundClip': 'text',
+      'WebkitTextFillColor': 'transparent',
+    }
+  },
+  description: {
+    fontStyle: 'italic',
+    fontWeight: 700,
+    marginBottom: '5px',
   }
 }
 
@@ -27,19 +57,23 @@ class UserContainer extends Component {
     if (this.props.store.selectedUser) {
       user = this.props.store.selectedUser;
       const nameParts = user.name.split(' ');
-      const firstname =nameParts[0];
-      const surname = nameParts[1];
+      const firstname = nameParts.shift();
+      const lastname = nameParts.join(' ');
       return (
         <div style={styles.backing}>
-          <div>{firstname} <span className="surname">{surname}</span></div>
+          <div style={styles.name}>
+            <span style={styles.name.first}>{firstname}</span> <span style={styles.name.last}>{lastname}</span>
+          </div>
           <div style={styles.details}>
-            <div>{user.company.name}</div>
-            <div>{user.company.catchPhrase}</div>
-            <div>{user.company.bs}</div>
-            <ul style={styles.details}>
-              <li><strong>Phone:</strong>{user.email}</li>
-              <li><strong>E-Email:</strong>{user.phone}</li>
-              <li><strong>URL:</strong> {user.website}</li>
+            <ul style={styles.description}>
+              <li>{user.company.name}</li>
+              <li>{user.company.catchPhrase}</li>
+              <li>{user.company.bs}</li>
+            </ul>
+            <ul>
+              <li><strong>Phone:</strong> <em>{user.email}</em></li>
+              <li><strong>E-Email:</strong> <em>{user.phone}</em></li>
+              <li><strong>URL:</strong> <em>{user.website}</em></li>
             </ul>
           </div>
         </div>
